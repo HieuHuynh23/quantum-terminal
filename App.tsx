@@ -569,15 +569,15 @@ export const App = () => {
       return (
           <g transform={`translate(${x},${y})`}>
               {/* Label Background for better contrast */}
-              <rect x={-48} y={-10} width={52} height={24} fill="#18181b" rx={4} opacity={0.9} stroke={level.color} strokeWidth={1} strokeOpacity={0.3} />
+              <rect x={-54} y={-13} width={58} height={27} fill="#18181b" rx={4} opacity={0.9} stroke={level.color} strokeWidth={1} strokeOpacity={0.3} />
               
               {/* Label Name (ENTRY, MAX...) */}
-              <text x={-4} y={-2} textAnchor="end" fill={level.color} fontSize={9} fontWeight="900" letterSpacing="0.5px">
+              <text x={-4} y={-3} textAnchor="end" fill={level.color} fontSize={9} fontWeight="900" letterSpacing="0.5px">
                   {level.label}
               </text>
               
               {/* Price Value */}
-              <text x={-4} y={10} textAnchor="end" fill="#e4e4e7" fontSize={10} fontFamily="monospace" fontWeight="bold">
+              <text x={-4} y={9} textAnchor="end" fill="#e4e4e7" fontSize={10} fontFamily="monospace" fontWeight="bold">
                   {formatNumber(val)}
               </text>
           </g>
@@ -1046,7 +1046,7 @@ export const App = () => {
                  
                  <div className="h-[450px] w-full p-4">
                     <ResponsiveContainer width="100%" height="100%">
-                       <ScatterChart margin={{top:20, right:20, left:48, bottom:20}}>
+                       <ScatterChart margin={{top:20, right:20, left:54, bottom:20}}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} strokeOpacity={0.5} />
                           <XAxis 
                              type="number" dataKey="lot" name="Lot" 
@@ -1059,7 +1059,7 @@ export const App = () => {
                              type="number" dataKey="price" name="Price" 
                              stroke="#71717a" fontSize={10} tickLine={false} axisLine={{ stroke: '#3f3f46' }} 
                              domain={yDomain}
-                             width={48}
+                             width={54}
                              ticks={[...new Set(specialLevels.map(l => l.value))].sort((a, b) => a - b)}
                              tick={<CustomYAxisTick />}
                              interval={0}
