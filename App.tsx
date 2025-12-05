@@ -569,15 +569,15 @@ export const App = () => {
       return (
           <g transform={`translate(${x},${y})`}>
               {/* Label Background for better contrast */}
-              <rect x={-48} y={-13} width={52} height={27} fill="#18181b" rx={4} opacity={0.9} stroke={level.color} strokeWidth={1} strokeOpacity={0.3} />
+              <rect x={-54} y={-13} width={58} height={27} fill="#18181b" rx={4} opacity={0.9} stroke={level.color} strokeWidth={1} strokeOpacity={0.3} />
               
               {/* Label Name (ENTRY, MAX...) */}
-              <text x={-2} y={-3} textAnchor="end" fill={level.color} fontSize={8} fontWeight="900" letterSpacing="0.5px">
+              <text x={-4} y={-3} textAnchor="end" fill={level.color} fontSize={9} fontWeight="900" letterSpacing="0.5px">
                   {level.label}
               </text>
               
               {/* Price Value */}
-              <text x={-2} y={9} textAnchor="end" fill="#e4e4e7" fontSize={9} fontFamily="monospace" fontWeight="bold">
+              <text x={-4} y={9} textAnchor="end" fill="#e4e4e7" fontSize={10} fontFamily="monospace" fontWeight="bold">
                   {formatNumber(val)}
               </text>
           </g>
