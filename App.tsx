@@ -387,7 +387,6 @@ export const App = () => {
 
   const [desiredPips, setDesiredPips] = useState<string>('20');
   const [isWinMode, setIsWinMode] = useState(false);
-  const [visibleRows, setVisibleRows] = useState(50);
   
   // Computed
   const [simResult, setSimResult] = useState<SimulationResult | null>(null);
@@ -1122,7 +1121,7 @@ export const App = () => {
                           </tr>
                        </thead>
                        <tbody className="divide-y divide-zinc-800/30 text-zinc-400">
-                          {simResult.positions.slice(0, visibleRows).map((p, idx) => {
+                          {simResult.positions.map((p, idx) => {
                              const projectedPnL = (() => {
                                 if (!profTgt.targetPrice) return 0;
                                 const dirMult = direction === 'LONG' ? 1 : -1;
@@ -1161,18 +1160,6 @@ export const App = () => {
                                 <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">{formatNumber(p.avgPrice)}</td>
                              </tr>
                           )})}
-                          {visibleRows < simResult.positions.length && (
-                             <tr>
-                                <td colSpan={9} className="p-2 text-center">
-                                   <button 
-                                      onClick={() => setVisibleRows(prev => prev + 50)}
-                                      className="text-xs font-bold text-zinc-500 hover:text-zinc-300 transition-colors py-2 w-full border border-dashed border-zinc-800 hover:border-zinc-600 rounded"
-                                   >
-                                      LOAD MORE ROWS ({simResult.positions.length - visibleRows} remaining)
-                                   </button>
-                                </td>
-                             </tr>
-                          )}
                        </tbody>
                        <tfoot className="bg-zinc-950/90 sticky bottom-0 backdrop-blur-sm z-20 border-t border-zinc-700 font-bold text-zinc-300 shadow-[0_-5px_15px_rgba(0,0,0,0.3)]">
                           <tr>
