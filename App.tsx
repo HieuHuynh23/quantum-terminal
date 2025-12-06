@@ -1202,7 +1202,6 @@ export const App = () => {
                              const isIndivWin = p.indivPnL > 0;
                              const isTargetReached = targetPnL > 0 && p.cumPnL >= targetPnL && (!prevP || prevP.cumPnL < targetPnL);
                              const isHedge = p.type === 'HEDGE';
-                             const isWinRow = isIndivWin && !isInProfit && !isHedge;
 
                              const projectedPnL = (() => {
                                 if (!profTgt.targetPrice) return 0;
@@ -1216,7 +1215,7 @@ export const App = () => {
                                 isHedge ? 'bg-amber-500/10' : 
                                 isTargetReached ? 'bg-cyan-500/10' :
                                 isInProfit ? 'bg-emerald-500/15 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]' : 
-                                isWinRow ? 'bg-emerald-500/10' : ''
+                                isIndivWin ? 'bg-emerald-500/10' : ''
                              }`}>
                                 <td className="px-4 py-2.5 relative">
                                    {/* Row Highlight Line */}
@@ -1229,7 +1228,7 @@ export const App = () => {
                                       <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
                                    ) : isInProfit ? (
                                       <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
-                                   ) : isWinRow ? (
+                                   ) : isIndivWin ? (
                                       <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
                                    ) : null}
 
@@ -1255,29 +1254,21 @@ export const App = () => {
                                       {isInProfit && !isProfitStart && !isTargetReached && !isHedge && (
                                          <span className="text-[9px] font-bold text-emerald-400 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]">PROFIT</span>
                                       )}
-                                      {isWinRow && (
+                                      {isIndivWin && !isInProfit && !isHedge && (
                                          <span className="text-[9px] font-bold text-emerald-500 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 animate-pulse">WIN</span>
                                       )}
                                    </div>
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300 group-hover:text-white transition-colors">{formatNumber(p.price)}</td>
-                                <td className="px-4 py-2.5 text-right font-mono text-zinc-500">
-                                   {isWinRow ? '' : formatNumber(p.dist)}
-                                </td>
+                                <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.dist)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300">{formatNumber(p.lot)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.indivPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(p.indivPnL)}</td>
-                                <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isInProfit ? 'text-glow' : ''}`}>
-                                   {isWinRow ? '' : formatCurrency(p.cumPnL)}
-                                </td>
+                                <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isInProfit ? 'text-glow' : ''}`}>{formatCurrency(p.cumPnL)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${projectedPnL<0?'text-rose-400':'text-emerald-400'}`}>
-                                   {isWinRow ? '' : formatCurrency(projectedPnL)}
+                                   {(isIndivWin && !isInProfit && !isHedge) ? '' : formatCurrency(projectedPnL)}
                                 </td>
-                                <td className="px-4 py-2.5 text-right font-mono text-zinc-500">
-                                   {isWinRow ? '' : formatNumber(p.totalLot)}
-                                </td>
-                                <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">
-                                   {isWinRow ? '' : formatNumber(p.avgPrice)}
-                                </td>
+                                <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.totalLot)}</td>
+                                <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">{formatNumber(p.avgPrice)}</td>
                              </tr>
                           )})}
                        </tbody>
