@@ -936,7 +936,11 @@ export const App = () => {
                           <div className="flex items-center gap-2">
                               <button
                                 onClick={() => setIsWinMode(!isWinMode)}
-                                className={`px-3 py-1 rounded text-[10px] font-bold border transition-all duration-300 ${isWinMode ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'bg-zinc-900/50 border-zinc-700 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600'}`}
+                                className={`px-3 py-1 rounded text-[10px] font-bold border transition-all duration-300 ${
+                                   isWinMode 
+                                      ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.2)]' 
+                                      : 'bg-rose-500/20 border-rose-500/50 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.2)]'
+                                }`}
                               >
                                 {isWinMode ? 'WIN' : 'LOSS'}
                               </button>
@@ -1081,18 +1085,33 @@ export const App = () => {
                           <ReferenceLine y={maxPrice} stroke="#ef4444" strokeDasharray="4 4" />
                           
                           {simResult.summary.isHedged && simResult.summary.hedgeTriggerPrice && (
-                             <ReferenceLine y={simResult.summary.hedgeTriggerPrice} stroke="#f59e0b" strokeDasharray="3 3" strokeWidth={2} />
+                             <ReferenceLine 
+                                y={simResult.summary.hedgeTriggerPrice} 
+                                stroke="#f59e0b" 
+                                strokeDasharray="3 3" 
+                                strokeWidth={2}
+                                label={{ position: 'insideTopRight', value: 'HEDGE', fill: '#f59e0b', fontSize: 10, fontWeight: 'bold', dy: -10 }}
+                             />
                           )}
 
                           {(!simResult.summary.isHedged || (simResult.summary.isHedged && Math.abs(simResult.summary.netAvgPrice) > 0.001)) && (
                              <ReferenceLine 
                                 y={simResult.summary.isHedged ? simResult.summary.netAvgPrice : simResult.summary.avgPrice} 
-                                stroke="#3b82f6" strokeDasharray="5 5" strokeWidth={2} 
+                                stroke="#3b82f6" 
+                                strokeDasharray="5 5" 
+                                strokeWidth={2}
+                                label={{ position: 'insideTopRight', value: 'BE', fill: '#3b82f6', fontSize: 10, fontWeight: 'bold', dy: 10 }}
                              />
                           )}
                           
                           {profTgt.targetPrice > 0 && (
-                            <ReferenceLine y={profTgt.targetPrice} stroke="#10b981" strokeWidth={2} strokeDasharray="8 4" />
+                            <ReferenceLine 
+                               y={profTgt.targetPrice} 
+                               stroke="#10b981" 
+                               strokeWidth={2} 
+                               strokeDasharray="8 4"
+                               label={{ position: 'insideTopRight', value: 'TARGET', fill: '#10b981', fontSize: 10, fontWeight: 'bold', dy: -10 }}
+                            />
                           )}
                        </ScatterChart>
                     </ResponsiveContainer>
@@ -1155,7 +1174,7 @@ export const App = () => {
                                       <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
                                    )}
                                    {isTargetReached && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] z-10"></div>
+                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
                                    )}
                                    {isHedge && (
                                       <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-10"></div>
@@ -1179,7 +1198,7 @@ export const App = () => {
 
                                       {/* Inline Badges */}
                                       {isProfitStart && <span className="text-[9px] font-bold text-emerald-500 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 animate-pulse">BE</span>}
-                                      {isTargetReached && <span className="text-[9px] font-bold text-cyan-400 px-1.5 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/20 animate-pulse">TARGET</span>}
+                                      {isTargetReached && <span className="text-[9px] font-bold text-cyan-400 px-1.5 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.3)] animate-pulse">TAKE PROFIT</span>}
                                    </div>
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300 group-hover:text-white transition-colors">{formatNumber(p.price)}</td>
