@@ -1255,7 +1255,7 @@ export const App = () => {
                                          <span className="text-[9px] font-bold text-emerald-400 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]">PROFIT</span>
                                       )}
                                       {isIndivWin && !isInProfit && !isHedge && (
-                                         <span className="text-[9px] font-bold text-emerald-500/70 px-1.5 py-0.5 bg-emerald-500/5 rounded border border-emerald-500/10">WIN</span>
+                                         <span className="text-[9px] font-bold text-emerald-500 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 animate-pulse">WIN</span>
                                       )}
                                    </div>
                                 </td>
