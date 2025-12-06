@@ -1213,7 +1213,7 @@ export const App = () => {
                              <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors group relative ${
                                 isHedge ? 'bg-amber-500/10' : 
                                 isTargetReached ? 'bg-cyan-500/10' :
-                                isInProfit ? 'bg-emerald-500/10' : ''
+                                isInProfit ? 'bg-emerald-500/15 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]' : ''
                              }`}>
                                 <td className="px-4 py-2.5 relative">
                                    {/* Row Highlight Line */}
@@ -1247,6 +1247,9 @@ export const App = () => {
                                       {/* Inline Badges */}
                                       {isProfitStart && <span className="text-[9px] font-bold text-emerald-500 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 animate-pulse">BE</span>}
                                       {isTargetReached && <span className="text-[9px] font-bold text-cyan-400 px-1.5 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.3)] animate-pulse">TAKE PROFIT</span>}
+                                      {isInProfit && !isProfitStart && !isTargetReached && !isHedge && (
+                                         <span className="text-[9px] font-bold text-emerald-400 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]">PROFIT</span>
+                                      )}
                                    </div>
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300 group-hover:text-white transition-colors">{formatNumber(p.price)}</td>
