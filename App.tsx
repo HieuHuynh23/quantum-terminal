@@ -1198,6 +1198,7 @@ export const App = () => {
                           {simResult.positions.map((p, idx) => {
                              const prevP = idx > 0 ? simResult.positions[idx-1] : null;
                              const isProfitStart = p.cumPnL >= 0 && (!prevP || prevP.cumPnL < 0);
+                             const isInProfit = p.cumPnL >= 0;
                              const isTargetReached = targetPnL > 0 && p.cumPnL >= targetPnL && (!prevP || prevP.cumPnL < targetPnL);
                              const isHedge = p.type === 'HEDGE';
 
@@ -1212,22 +1213,20 @@ export const App = () => {
                              <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors group relative ${
                                 isHedge ? 'bg-amber-500/[0.02]' : 
                                 isTargetReached ? 'bg-cyan-500/[0.05]' :
-                                isProfitStart ? 'bg-emerald-500/[0.02]' : ''
+                                isInProfit ? 'bg-emerald-500/[0.02]' : ''
                              }`}>
                                 <td className="px-4 py-2.5 relative">
                                    {/* Row Highlight Line */}
                                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-transparent group-hover:bg-[var(--theme-color)] transition-colors"></div>
                                    
                                    {/* Status Indicators */}
-                                   {isProfitStart && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
-                                   )}
-                                   {isTargetReached && (
-                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
-                                   )}
-                                   {isHedge && (
+                                   {isHedge ? (
                                       <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-10"></div>
-                                   )}
+                                   ) : isTargetReached ? (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
+                                   ) : isInProfit ? (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
+                                   ) : null}
 
                                    <div className="flex items-center gap-2">
                                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex w-fit items-center gap-1.5 ${
@@ -1254,7 +1253,7 @@ export const App = () => {
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.dist)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300">{formatNumber(p.lot)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.indivPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(p.indivPnL)}</td>
-                                <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isProfitStart ? 'text-glow' : ''}`}>{formatCurrency(p.cumPnL)}</td>
+                                <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isInProfit ? 'text-glow' : ''}`}>{formatCurrency(p.cumPnL)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${projectedPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(projectedPnL)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.totalLot)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">{formatNumber(p.avgPrice)}</td>
