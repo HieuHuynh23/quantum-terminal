@@ -1180,8 +1180,8 @@ export const App = () => {
                     </button>
                  </div>
                  <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
-                    <table className="w-full text-xs text-left border-collapse min-w-[800px]">
-                       <thead className="text-zinc-500 font-bold uppercase tracking-wider sticky top-0 z-20 bg-zinc-950 shadow-lg">
+                    <table className="w-full text-sm text-left border-collapse min-w-[800px]">
+                       <thead className="text-xs text-zinc-500 font-bold uppercase tracking-wider sticky top-0 z-20 bg-zinc-950 shadow-lg">
                           <tr>
                              <th className="px-4 py-3 border-b border-zinc-800">Type</th>
                              <th className="px-4 py-3 text-right border-b border-zinc-800">Price</th>
