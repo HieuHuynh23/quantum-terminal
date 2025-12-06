@@ -379,25 +379,25 @@ const AnimatedReferenceLabel = ({ viewBox, labelText, fill, dy = -10 }: any) => 
 // --- MAIN APP ---
 export const App = () => {
   // State
-  const [entryPrice, setEntryPrice] = useState(2000);
-  const [range, setRange] = useState(50);
-  const [maxPrice, setMaxPrice] = useState(1950);
+  const [entryPrice, setEntryPrice] = useState<number | ''>(4200);
+  const [range, setRange] = useState<number | ''>(30);
+  const [maxPrice, setMaxPrice] = useState(4170);
   const [direction, setDirection] = useState<'LONG' | 'SHORT'>('LONG');
   
-  const [step, setStep] = useState(10);
-  const [initLot, setInitLot] = useState(0.01);
-  const [multi, setMulti] = useState(1.4);
+  const [step, setStep] = useState<number | ''>(0.5);
+  const [initLot, setInitLot] = useState<number | ''>(0.01);
+  const [multi, setMulti] = useState<number | ''>(1.1);
   const [contractSize, setContractSize] = useState(100);
   const [useDynamic, setUseDynamic] = useState(false);
   
-  const [balance, setBalance] = useState(10000);
+  const [balance, setBalance] = useState<number | ''>(10000);
   
   // Hedge
   const [useHedge, setUseHedge] = useState(false);
   const [hedgeStopLoss, setHedgeStopLoss] = useState(-4000); 
   const [hedgeStopLossDisplay, setHedgeStopLossDisplay] = useState("-4000");
-  const [hedgeLotMulti, setHedgeLotMulti] = useState(2.0);
-  const [hedgeSlMulti, setHedgeSlMulti] = useState(2.0);
+  const [hedgeLotMulti, setHedgeLotMulti] = useState<number | ''>(2.0);
+  const [hedgeSlMulti, setHedgeSlMulti] = useState<number | ''>(2.0);
 
   // Solvers
   const [targetBE, setTargetBE] = useState<number | ''>('');
@@ -417,8 +417,8 @@ export const App = () => {
   // --- EFFECT: Calculation ---
   useEffect(() => {
     const res = calculateSimulation(
-        entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic,
-        { enabled: useHedge, stopLossAmount: hedgeStopLoss, lotMulti: hedgeLotMulti, slMulti: hedgeSlMulti },
+        Number(entryPrice), maxPrice, Number(step), Number(initLot), Number(multi), direction, contractSize, useDynamic,
+        { enabled: useHedge, stopLossAmount: hedgeStopLoss, lotMulti: Number(hedgeLotMulti), slMulti: Number(hedgeSlMulti) },
         isWinMode,
         Number(desiredPips) || 0
     );
@@ -428,20 +428,26 @@ export const App = () => {
   // --- HANDLERS ---
   const handleDirectionChange = (newDir: 'LONG' | 'SHORT') => {
     setDirection(newDir);
-    if (newDir === 'LONG') setMaxPrice(entryPrice - range);
-    else setMaxPrice(entryPrice + range);
+    const ep = Number(entryPrice);
+    const r = Number(range);
+    if (newDir === 'LONG') setMaxPrice(ep - r);
+    else setMaxPrice(ep + r);
   };
 
-  const handleEntryChange = (val: number) => {
+  const handleEntryChange = (val: number | '') => {
     setEntryPrice(val);
-    if (direction === 'LONG') setMaxPrice(val - range);
-    else setMaxPrice(val + range);
+    const numVal = Number(val);
+    const r = Number(range);
+    if (direction === 'LONG') setMaxPrice(numVal - r);
+    else setMaxPrice(numVal + r);
   };
 
-  const handleRangeChange = (val: number) => {
+  const handleRangeChange = (val: number | '') => {
     setRange(val);
-    if (direction === 'LONG') setMaxPrice(entryPrice - val);
-    else setMaxPrice(entryPrice + val);
+    const ep = Number(entryPrice);
+    const r = Number(val);
+    if (direction === 'LONG') setMaxPrice(ep - r);
+    else setMaxPrice(ep + r);
   };
   
   const handleTargetPnLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -706,7 +712,7 @@ export const App = () => {
                           <input
                              type="number"
                              value={balance}
-                             onChange={(e) => setBalance(Number(e.target.value))}
+                             onChange={(e) => setBalance(e.target.value === '' ? '' : Number(e.target.value))}
                              className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-emerald-400 font-bold text-lg"
                           />
                           <div className="absolute inset-0 border border-emerald-500/0 group-hover:border-emerald-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
@@ -737,7 +743,7 @@ export const App = () => {
                              <input
                                 type="number"
                                 value={entryPrice}
-                                onChange={(e) => handleEntryChange(Number(e.target.value))}
+                                onChange={(e) => handleEntryChange(e.target.value === '' ? '' : Number(e.target.value))}
                                 className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
                              />
                              <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
@@ -749,7 +755,7 @@ export const App = () => {
                              <input
                                 type="number"
                                 value={initLot}
-                                onChange={(e) => setInitLot(Number(e.target.value))}
+                                onChange={(e) => setInitLot(e.target.value === '' ? '' : Number(e.target.value))}
                                 step={0.01}
                                 className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
                              />
@@ -762,7 +768,7 @@ export const App = () => {
                              <input
                                 type="number"
                                 value={step}
-                                onChange={(e) => setStep(Number(e.target.value))}
+                                onChange={(e) => setStep(e.target.value === '' ? '' : Number(e.target.value))}
                                 className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
                              />
                              <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
@@ -774,7 +780,7 @@ export const App = () => {
                              <input
                                 type="number"
                                 value={multi}
-                                onChange={(e) => setMulti(Number(e.target.value))}
+                                onChange={(e) => setMulti(e.target.value === '' ? '' : Number(e.target.value))}
                                 step={0.1}
                                 className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
                              />
@@ -829,7 +835,7 @@ export const App = () => {
                                 <input 
                                    type="number" 
                                    value={range} 
-                                   onChange={(e) => handleRangeChange(Number(e.target.value))}
+                                   onChange={(e) => handleRangeChange(e.target.value === '' ? '' : Number(e.target.value))}
                                    className="w-16 bg-transparent text-center font-mono text-lg font-bold text-[var(--theme-color)] outline-none"
                                 />
                                 <button onClick={() => handleRangeChange(Math.min(1000, range + 1))} className="p-1.5 hover:bg-zinc-700 rounded text-zinc-500 hover:text-zinc-300 transition-colors">
@@ -855,7 +861,8 @@ export const App = () => {
 
                              <input
                                 type="range" min={1} max={1000} step={1}
-                                value={range} onChange={(e) => handleRangeChange(Number(e.target.value))}
+                                value={typeof range === 'number' ? range : 0} 
+                                onChange={(e) => handleRangeChange(Number(e.target.value))}
                                 className="absolute w-full h-full opacity-0 cursor-pointer z-20"
                              />
                           </div>
@@ -913,7 +920,7 @@ export const App = () => {
                                    <input
                                       type="number"
                                       value={hedgeLotMulti}
-                                      onChange={(e) => setHedgeLotMulti(Number(e.target.value))}
+                                      onChange={(e) => setHedgeLotMulti(e.target.value === '' ? '' : Number(e.target.value))}
                                       step={0.1}
                                       className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-amber-400 transition-colors"
                                    />
@@ -926,7 +933,7 @@ export const App = () => {
                                    <input
                                       type="number"
                                       value={hedgeSlMulti}
-                                      onChange={(e) => setHedgeSlMulti(Number(e.target.value))}
+                                      onChange={(e) => setHedgeSlMulti(e.target.value === '' ? '' : Number(e.target.value))}
                                       step={0.1}
                                       className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-amber-400 transition-colors"
                                    />
@@ -1127,7 +1134,7 @@ export const App = () => {
                                 strokeDasharray="3 3" 
                                 strokeWidth={2}
                                 style={{ filter: 'drop-shadow(0 0 6px #f59e0b)' }}
-                                label={<AnimatedReferenceLabel labelText={`HEDGE [${formatNumber(simResult.summary.hedgeTriggerPrice)}]`} fill="#f59e0b" dy={-10} />}
+                                label={<AnimatedReferenceLabel labelText={`HEDGE: ${formatNumber(simResult.summary.hedgeTriggerPrice)}`} fill="#f59e0b" dy={-10} />}
                              />
                           )}
 
@@ -1138,7 +1145,7 @@ export const App = () => {
                                 strokeDasharray="5 5" 
                                 strokeWidth={2}
                                 style={{ filter: 'drop-shadow(0 0 6px #3b82f6)' }}
-                                label={<AnimatedReferenceLabel labelText={`BE [${formatNumber(simResult.summary.isHedged ? simResult.summary.netAvgPrice : simResult.summary.avgPrice)}]`} fill="#3b82f6" dy={10} />}
+                                label={<AnimatedReferenceLabel labelText={`BE: ${formatNumber(simResult.summary.isHedged ? simResult.summary.netAvgPrice : simResult.summary.avgPrice)}`} fill="#3b82f6" dy={10} />}
                              />
                           )}
                           
@@ -1149,7 +1156,7 @@ export const App = () => {
                                strokeWidth={2} 
                                strokeDasharray="8 4"
                                style={{ filter: 'drop-shadow(0 0 6px #10b981)' }}
-                               label={<AnimatedReferenceLabel labelText={`TARGET [${formatNumber(profTgt.targetPrice)}]`} fill="#10b981" dy={-10} />}
+                               label={<AnimatedReferenceLabel labelText={`TARGET: ${formatNumber(profTgt.targetPrice)}`} fill="#10b981" dy={-10} />}
                             />
                           )}
                        </ScatterChart>
