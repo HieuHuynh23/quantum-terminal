@@ -602,7 +602,7 @@ export const App = () => {
               </text>
               
               {/* Price Value */}
-              <text x={-4} y={9} textAnchor="end" fill="#e4e4e7" fontSize={10} fontFamily="monospace" fontWeight="bold">
+              <text x={-4} y={9} textAnchor="end" fill={level.color} fontSize={10} fontFamily="monospace" fontWeight="bold">
                   {formatNumber(val)}
               </text>
           </g>
