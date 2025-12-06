@@ -1211,9 +1211,9 @@ export const App = () => {
                              
                              return (
                              <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors group relative ${
-                                isHedge ? 'bg-amber-500/[0.02]' : 
-                                isTargetReached ? 'bg-cyan-500/[0.05]' :
-                                isInProfit ? 'bg-emerald-500/[0.02]' : ''
+                                isHedge ? 'bg-amber-500/10' : 
+                                isTargetReached ? 'bg-cyan-500/10' :
+                                isInProfit ? 'bg-emerald-500/10' : ''
                              }`}>
                                 <td className="px-4 py-2.5 relative">
                                    {/* Row Highlight Line */}
@@ -1221,11 +1221,11 @@ export const App = () => {
                                    
                                    {/* Status Indicators */}
                                    {isHedge ? (
-                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-10"></div>
+                                      <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-10"></div>
                                    ) : isTargetReached ? (
-                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
+                                      <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
                                    ) : isInProfit ? (
-                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
+                                      <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
                                    ) : null}
 
                                    <div className="flex items-center gap-2">
