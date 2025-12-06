@@ -377,6 +377,7 @@ export const App = () => {
   // Hedge
   const [useHedge, setUseHedge] = useState(false);
   const [hedgeStopLoss, setHedgeStopLoss] = useState(-4000); 
+  const [hedgeStopLossDisplay, setHedgeStopLossDisplay] = useState("-4000");
   const [hedgeLotMulti, setHedgeLotMulti] = useState(2.0);
   const [hedgeSlMulti, setHedgeSlMulti] = useState(2.0);
 
@@ -861,9 +862,14 @@ export const App = () => {
                              </label>
                              <div className="relative group">
                                 <input
-                                   type="number"
-                                   value={hedgeStopLoss}
-                                   onChange={(e) => setHedgeStopLoss(Number(e.target.value))}
+                                   type="text"
+                                   value={hedgeStopLossDisplay}
+                                   onChange={(e) => {
+                                      setHedgeStopLossDisplay(e.target.value);
+                                      if (e.target.value === '' || e.target.value === '-') return;
+                                      const val = parseFloat(e.target.value);
+                                      if (!isNaN(val)) setHedgeStopLoss(val);
+                                   }}
                                    className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-amber-400 font-bold"
                                 />
                                 <div className="absolute inset-0 border border-amber-500/0 group-hover:border-amber-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
