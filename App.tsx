@@ -733,41 +733,53 @@ export const App = () => {
                     <div className="grid grid-cols-2 gap-4">
                        <div className="space-y-2">
                           <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Entry Price</label>
-                          <input
-                             type="number"
-                             value={entryPrice}
-                             onChange={(e) => handleEntryChange(Number(e.target.value))}
-                             className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
-                          />
+                          <div className="relative group">
+                             <input
+                                type="number"
+                                value={entryPrice}
+                                onChange={(e) => handleEntryChange(Number(e.target.value))}
+                                className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
+                             />
+                             <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                          </div>
                        </div>
                        <div className="space-y-2">
                           <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Init Lot</label>
-                          <input
-                             type="number"
-                             value={initLot}
-                             onChange={(e) => setInitLot(Number(e.target.value))}
-                             step={0.01}
-                             className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
-                          />
+                          <div className="relative group">
+                             <input
+                                type="number"
+                                value={initLot}
+                                onChange={(e) => setInitLot(Number(e.target.value))}
+                                step={0.01}
+                                className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
+                             />
+                             <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                          </div>
                        </div>
                        <div className="space-y-2">
                           <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Grid Step</label>
-                          <input
-                             type="number"
-                             value={step}
-                             onChange={(e) => setStep(Number(e.target.value))}
-                             className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
-                          />
+                          <div className="relative group">
+                             <input
+                                type="number"
+                                value={step}
+                                onChange={(e) => setStep(Number(e.target.value))}
+                                className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
+                             />
+                             <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                          </div>
                        </div>
                        <div className="space-y-2">
                           <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Multiplier</label>
-                          <input
-                             type="number"
-                             value={multi}
-                             onChange={(e) => setMulti(Number(e.target.value))}
-                             step={0.1}
-                             className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
-                          />
+                          <div className="relative group">
+                             <input
+                                type="number"
+                                value={multi}
+                                onChange={(e) => setMulti(Number(e.target.value))}
+                                step={0.1}
+                                className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-cyan-400 transition-colors"
+                             />
+                             <div className="absolute inset-0 border border-cyan-500/0 group-hover:border-cyan-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                          </div>
                        </div>
                     </div>
 
@@ -897,23 +909,29 @@ export const App = () => {
                           <div className="grid grid-cols-2 gap-4">
                              <div className="space-y-2">
                                 <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">Hedge Lot x</label>
-                                <input
-                                   type="number"
-                                   value={hedgeLotMulti}
-                                   onChange={(e) => setHedgeLotMulti(Number(e.target.value))}
-                                   step={0.1}
-                                   className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-amber-400 transition-colors"
-                                />
+                                <div className="relative group">
+                                   <input
+                                      type="number"
+                                      value={hedgeLotMulti}
+                                      onChange={(e) => setHedgeLotMulti(Number(e.target.value))}
+                                      step={0.1}
+                                      className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-amber-400 transition-colors"
+                                   />
+                                   <div className="absolute inset-0 border border-amber-500/0 group-hover:border-amber-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                                </div>
                              </div>
                              <div className="space-y-2">
                                 <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500">SL Expand x</label>
-                                <input
-                                   type="number"
-                                   value={hedgeSlMulti}
-                                   onChange={(e) => setHedgeSlMulti(Number(e.target.value))}
-                                   step={0.1}
-                                   className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-amber-400 transition-colors"
-                                />
+                                <div className="relative group">
+                                   <input
+                                      type="number"
+                                      value={hedgeSlMulti}
+                                      onChange={(e) => setHedgeSlMulti(Number(e.target.value))}
+                                      step={0.1}
+                                      className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-zinc-300 focus:text-amber-400 transition-colors"
+                                   />
+                                   <div className="absolute inset-0 border border-amber-500/0 group-hover:border-amber-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                                </div>
                              </div>
                           </div>
                           

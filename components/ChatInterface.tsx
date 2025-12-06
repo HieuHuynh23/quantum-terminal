@@ -94,14 +94,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ messages, onSendMe
       {/* Input Area */}
       <div className="p-4 bg-slate-800 border-t border-slate-700">
         <form onSubmit={handleSubmit} className="flex space-x-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about your data..."
-            className="flex-1 bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500 transition-all"
-            disabled={isLoading}
-          />
+          <div className="flex-1 relative group">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Ask about your data..."
+              className="w-full bg-slate-900 border border-slate-600 text-white rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500 placeholder-slate-500 transition-all"
+              disabled={isLoading}
+            />
+            <div className="absolute inset-0 border border-blue-500/0 group-hover:border-blue-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+          </div>
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
