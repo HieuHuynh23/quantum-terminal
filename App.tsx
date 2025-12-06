@@ -1128,6 +1128,11 @@ export const App = () => {
                        </thead>
                        <tbody className="divide-y divide-zinc-800/30 text-zinc-400">
                           {simResult.positions.map((p, idx) => {
+                             const prevP = idx > 0 ? simResult.positions[idx-1] : null;
+                             const isProfitStart = p.cumPnL >= 0 && (!prevP || prevP.cumPnL < 0);
+                             const isTargetReached = targetPnL > 0 && p.cumPnL >= targetPnL && (!prevP || prevP.cumPnL < targetPnL);
+                             const isHedge = p.type === 'HEDGE';
+
                              const projectedPnL = (() => {
                                 if (!profTgt.targetPrice) return 0;
                                 const dirMult = direction === 'LONG' ? 1 : -1;
@@ -1136,31 +1141,52 @@ export const App = () => {
                              })();
                              
                              return (
-                             <tr key={p.id} className="hover:bg-white/[0.02] transition-colors group relative">
+                             <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors group relative ${
+                                isHedge ? 'bg-amber-500/[0.02]' : 
+                                isTargetReached ? 'bg-cyan-500/[0.05]' :
+                                isProfitStart ? 'bg-emerald-500/[0.02]' : ''
+                             }`}>
                                 <td className="px-4 py-2.5 relative">
                                    {/* Row Highlight Line */}
                                    <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-transparent group-hover:bg-[var(--theme-color)] transition-colors"></div>
                                    
-                                   <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex w-fit items-center gap-1.5 ${
-                                      p.type==='HEDGE' ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' :
-                                      p.type==='DYN' ? 'bg-purple-500/10 border-purple-500/30 text-purple-400' :
-                                      p.type==='ENTRY' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
-                                      'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                                   }`}>
-                                      <span className={`w-1 h-1 rounded-full ${
-                                         p.type==='HEDGE' ? 'bg-amber-500' :
-                                         p.type==='DYN' ? 'bg-purple-500' :
-                                         p.type==='ENTRY' ? 'bg-emerald-500' :
-                                         'bg-blue-500'
-                                      }`}></span>
-                                      {p.type==='MAIN'?p.level:p.type==='ENTRY'?'ENTRY':p.level}
-                                   </span>
+                                   {/* Status Indicators */}
+                                   {isProfitStart && (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
+                                   )}
+                                   {isTargetReached && (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.6)] z-10"></div>
+                                   )}
+                                   {isHedge && (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] z-10"></div>
+                                   )}
+
+                                   <div className="flex items-center gap-2">
+                                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold border flex w-fit items-center gap-1.5 ${
+                                         p.type==='HEDGE' ? 'bg-amber-500/10 border-amber-500/30 text-amber-500' :
+                                         p.type==='DYN' ? 'bg-purple-500/10 border-purple-500/30 text-purple-400' :
+                                         p.type==='ENTRY' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' :
+                                         'bg-blue-500/10 border-blue-500/30 text-blue-400'
+                                      }`}>
+                                         <span className={`w-1 h-1 rounded-full ${
+                                            p.type==='HEDGE' ? 'bg-amber-500' :
+                                            p.type==='DYN' ? 'bg-purple-500' :
+                                            p.type==='ENTRY' ? 'bg-emerald-500' :
+                                            'bg-blue-500'
+                                         }`}></span>
+                                         {p.type==='MAIN'?p.level:p.type==='ENTRY'?'ENTRY':p.level}
+                                      </span>
+
+                                      {/* Inline Badges */}
+                                      {isProfitStart && <span className="text-[9px] font-bold text-emerald-500 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 animate-pulse">BE</span>}
+                                      {isTargetReached && <span className="text-[9px] font-bold text-cyan-400 px-1.5 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/20 animate-pulse">TARGET</span>}
+                                   </div>
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300 group-hover:text-white transition-colors">{formatNumber(p.price)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.dist)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300">{formatNumber(p.lot)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.indivPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(p.indivPnL)}</td>
-                                <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatCurrency(p.cumPnL)}</td>
+                                <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isProfitStart ? 'text-glow' : ''}`}>{formatCurrency(p.cumPnL)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${projectedPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(projectedPnL)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.totalLot)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">{formatNumber(p.avgPrice)}</td>
