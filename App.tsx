@@ -358,7 +358,7 @@ const StatRow = ({ label, value, subValue, highlight = false, colorClass = "text
   </div>
 );
 
-const AnimatedReferenceLabel = ({ viewBox, value, fill, dy = -10 }: any) => {
+const AnimatedReferenceLabel = ({ viewBox, labelText, fill, dy = -10 }: any) => {
    const { x, y, width } = viewBox;
    return (
       <text 
@@ -371,7 +371,7 @@ const AnimatedReferenceLabel = ({ viewBox, value, fill, dy = -10 }: any) => {
          className="animate-pulse"
          style={{ filter: `drop-shadow(0 0 5px ${fill})` }}
       >
-         {value}
+         {labelText}
       </text>
    );
 };
@@ -1108,7 +1108,8 @@ export const App = () => {
                                 stroke="#f59e0b" 
                                 strokeDasharray="3 3" 
                                 strokeWidth={2}
-                                label={<AnimatedReferenceLabel value="HEDGE" fill="#f59e0b" dy={-10} />}
+                                style={{ filter: 'drop-shadow(0 0 6px #f59e0b)' }}
+                                label={<AnimatedReferenceLabel labelText={`HEDGE [${formatNumber(simResult.summary.hedgeTriggerPrice)}]`} fill="#f59e0b" dy={-10} />}
                              />
                           )}
 
@@ -1118,7 +1119,8 @@ export const App = () => {
                                 stroke="#3b82f6" 
                                 strokeDasharray="5 5" 
                                 strokeWidth={2}
-                                label={<AnimatedReferenceLabel value="BE" fill="#3b82f6" dy={10} />}
+                                style={{ filter: 'drop-shadow(0 0 6px #3b82f6)' }}
+                                label={<AnimatedReferenceLabel labelText={`BE [${formatNumber(simResult.summary.isHedged ? simResult.summary.netAvgPrice : simResult.summary.avgPrice)}]`} fill="#3b82f6" dy={10} />}
                              />
                           )}
                           
@@ -1128,7 +1130,8 @@ export const App = () => {
                                stroke="#10b981" 
                                strokeWidth={2} 
                                strokeDasharray="8 4"
-                               label={<AnimatedReferenceLabel value="TARGET" fill="#10b981" dy={-10} />}
+                               style={{ filter: 'drop-shadow(0 0 6px #10b981)' }}
+                               label={<AnimatedReferenceLabel labelText={`TARGET [${formatNumber(profTgt.targetPrice)}]`} fill="#10b981" dy={-10} />}
                             />
                           )}
                        </ScatterChart>
