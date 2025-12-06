@@ -1265,7 +1265,7 @@ export const App = () => {
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.indivPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(p.indivPnL)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isInProfit ? 'text-glow' : ''}`}>{formatCurrency(p.cumPnL)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${projectedPnL<0?'text-rose-400':'text-emerald-400'}`}>
-                                   {(isIndivWin && !isInProfit && !isHedge) ? '' : formatCurrency(projectedPnL)}
+                                   {isIndivWin ? '' : formatCurrency(projectedPnL)}
                                 </td>
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.totalLot)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">{formatNumber(p.avgPrice)}</td>
