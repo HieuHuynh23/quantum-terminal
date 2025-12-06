@@ -1189,7 +1189,9 @@ export const App = () => {
                              <th className="px-4 py-3 text-right border-b border-zinc-800">Lot</th>
                              <th className="px-4 py-3 text-right border-b border-zinc-800">Indiv PnL</th>
                              <th className="px-4 py-3 text-right border-b border-zinc-800">Cumul PnL</th>
-                             <th className="px-4 py-3 text-right border-b border-zinc-800">Target PnL</th>
+                             {!simResult.positions.some(p => p.indivPnL > 0) && (
+                                <th className="px-4 py-3 text-right border-b border-zinc-800">Target PnL</th>
+                             )}
                              <th className="px-4 py-3 text-right border-b border-zinc-800">Net Lot</th>
                              <th className="px-4 py-3 text-right border-b border-zinc-800">Net Price</th>
                           </tr>
@@ -1202,6 +1204,7 @@ export const App = () => {
                              const isIndivWin = p.indivPnL > 0;
                              const isTargetReached = targetPnL > 0 && p.cumPnL >= targetPnL && (!prevP || prevP.cumPnL < targetPnL);
                              const isHedge = p.type === 'HEDGE';
+                             const isAnyWin = simResult.positions.some(pos => pos.indivPnL > 0);
 
                              const projectedPnL = (() => {
                                 if (!profTgt.targetPrice) return 0;
@@ -1264,9 +1267,11 @@ export const App = () => {
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-300">{formatNumber(p.lot)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.indivPnL<0?'text-rose-400':'text-emerald-400'}`}>{formatCurrency(p.indivPnL)}</td>
                                 <td className={`px-4 py-2.5 text-right font-mono font-bold ${p.cumPnL<0?'text-rose-400':'text-emerald-400'} ${isInProfit ? 'text-glow' : ''}`}>{formatCurrency(p.cumPnL)}</td>
-                                <td className={`px-4 py-2.5 text-right font-mono font-bold ${projectedPnL<0?'text-rose-400':'text-emerald-400'}`}>
-                                   {(isIndivWin || isInProfit || isHedge || isTargetReached) ? '' : formatCurrency(projectedPnL)}
-                                </td>
+                                {!isAnyWin && (
+                                   <td className={`px-4 py-2.5 text-right font-mono font-bold ${projectedPnL<0?'text-rose-400':'text-emerald-400'}`}>
+                                      {formatCurrency(projectedPnL)}
+                                   </td>
+                                )}
                                 <td className="px-4 py-2.5 text-right font-mono text-zinc-500">{formatNumber(p.totalLot)}</td>
                                 <td className="px-4 py-2.5 text-right font-mono text-blue-400 group-hover:text-blue-300 transition-colors">{formatNumber(p.avgPrice)}</td>
                              </tr>
@@ -1280,7 +1285,9 @@ export const App = () => {
                              <td className="px-4 py-3 text-right text-indigo-400 font-mono text-sm">{formatNumber(simResult.positions.reduce((acc, p) => acc + p.lot, 0))}</td>
                              <td className={`px-4 py-3 text-right font-mono text-sm ${simResult.summary.pnl<0?'text-rose-400':'text-emerald-400 text-glow'}`}>{formatCurrency(simResult.summary.pnl)}</td>
                              <td className="px-4 py-3 text-right">-</td>
-                             <td className={`px-4 py-3 text-right font-mono text-sm ${profTgt.profit<0?'text-rose-400':'text-emerald-400 text-glow'}`}>{formatCurrency(profTgt.profit)}</td>
+                             {!simResult.positions.some(p => p.indivPnL > 0) && (
+                                <td className={`px-4 py-3 text-right font-mono text-sm ${profTgt.profit<0?'text-rose-400':'text-emerald-400 text-glow'}`}>{formatCurrency(profTgt.profit)}</td>
+                             )}
                              <td className="px-4 py-3 text-right text-indigo-400 font-mono text-sm">{formatNumber(simResult.summary.netLot)}</td>
                              <td className="px-4 py-3 text-right text-blue-400 font-mono text-sm">{formatNumber(simResult.summary.netAvgPrice)}</td>
                           </tr>
