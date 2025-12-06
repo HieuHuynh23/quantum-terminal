@@ -1199,6 +1199,7 @@ export const App = () => {
                              const prevP = idx > 0 ? simResult.positions[idx-1] : null;
                              const isProfitStart = p.cumPnL >= 0 && (!prevP || prevP.cumPnL < 0);
                              const isInProfit = p.cumPnL >= 0;
+                             const isIndivWin = p.indivPnL > 0;
                              const isTargetReached = targetPnL > 0 && p.cumPnL >= targetPnL && (!prevP || prevP.cumPnL < targetPnL);
                              const isHedge = p.type === 'HEDGE';
 
@@ -1213,7 +1214,8 @@ export const App = () => {
                              <tr key={p.id} className={`hover:bg-white/[0.02] transition-colors group relative ${
                                 isHedge ? 'bg-amber-500/10' : 
                                 isTargetReached ? 'bg-cyan-500/10' :
-                                isInProfit ? 'bg-emerald-500/15 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]' : ''
+                                isInProfit ? 'bg-emerald-500/15 shadow-[inset_0_0_20px_rgba(16,185,129,0.05)]' : 
+                                isIndivWin ? 'bg-emerald-500/5' : ''
                              }`}>
                                 <td className="px-4 py-2.5 relative">
                                    {/* Row Highlight Line */}
@@ -1226,6 +1228,8 @@ export const App = () => {
                                       <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)] z-10 animate-pulse"></div>
                                    ) : isInProfit ? (
                                       <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] z-10"></div>
+                                   ) : isIndivWin ? (
+                                      <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-emerald-500/50 z-10"></div>
                                    ) : null}
 
                                    <div className="flex items-center gap-2">
@@ -1249,6 +1253,9 @@ export const App = () => {
                                       {isTargetReached && <span className="text-[9px] font-bold text-cyan-400 px-1.5 py-0.5 bg-cyan-500/10 rounded border border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.3)] animate-pulse">TAKE PROFIT</span>}
                                       {isInProfit && !isProfitStart && !isTargetReached && !isHedge && (
                                          <span className="text-[9px] font-bold text-emerald-400 px-1.5 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.2)]">PROFIT</span>
+                                      )}
+                                      {isIndivWin && !isInProfit && !isHedge && (
+                                         <span className="text-[9px] font-bold text-emerald-500/70 px-1.5 py-0.5 bg-emerald-500/5 rounded border border-emerald-500/10">WIN</span>
                                       )}
                                    </div>
                                 </td>
