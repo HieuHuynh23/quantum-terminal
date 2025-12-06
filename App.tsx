@@ -358,6 +358,24 @@ const StatRow = ({ label, value, subValue, highlight = false, colorClass = "text
   </div>
 );
 
+const AnimatedReferenceLabel = ({ viewBox, value, fill, dy = -10 }: any) => {
+   const { x, y, width } = viewBox;
+   return (
+      <text 
+         x={x + width - 5} 
+         y={y + dy} 
+         fill={fill} 
+         fontSize={10} 
+         fontWeight="bold" 
+         textAnchor="end" 
+         className="animate-pulse"
+         style={{ filter: `drop-shadow(0 0 5px ${fill})` }}
+      >
+         {value}
+      </text>
+   );
+};
+
 // --- MAIN APP ---
 export const App = () => {
   // State
@@ -1090,7 +1108,7 @@ export const App = () => {
                                 stroke="#f59e0b" 
                                 strokeDasharray="3 3" 
                                 strokeWidth={2}
-                                label={{ position: 'insideTopRight', value: 'HEDGE', fill: '#f59e0b', fontSize: 10, fontWeight: 'bold', dy: -10 }}
+                                label={<AnimatedReferenceLabel value="HEDGE" fill="#f59e0b" dy={-10} />}
                              />
                           )}
 
@@ -1100,7 +1118,7 @@ export const App = () => {
                                 stroke="#3b82f6" 
                                 strokeDasharray="5 5" 
                                 strokeWidth={2}
-                                label={{ position: 'insideTopRight', value: 'BE', fill: '#3b82f6', fontSize: 10, fontWeight: 'bold', dy: 10 }}
+                                label={<AnimatedReferenceLabel value="BE" fill="#3b82f6" dy={10} />}
                              />
                           )}
                           
@@ -1110,7 +1128,7 @@ export const App = () => {
                                stroke="#10b981" 
                                strokeWidth={2} 
                                strokeDasharray="8 4"
-                               label={{ position: 'insideTopRight', value: 'TARGET', fill: '#10b981', fontSize: 10, fontWeight: 'bold', dy: -10 }}
+                               label={<AnimatedReferenceLabel value="TARGET" fill="#10b981" dy={-10} />}
                             />
                           )}
                        </ScatterChart>
