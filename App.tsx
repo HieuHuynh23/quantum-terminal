@@ -430,6 +430,7 @@ export const App = () => {
   const [isWinMode, setIsWinMode] = useState(false);
   
   // Exit Scenario
+  const [exitScenarioMode, setExitScenarioMode] = useState<'pips' | 'manual'>('pips');
   const [exitInputMode, setExitInputMode] = useState<'order' | 'price'>('order');
   const [exitOrderNumber, setExitOrderNumber] = useState<number | ''>('');
   const [exitPrice, setExitPrice] = useState<number | ''>('');
@@ -1093,114 +1094,152 @@ export const App = () => {
                        
                        <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-4">Exit point will auto-enable WIN mode</div>
 
-                       {/* Desired Profit Target Input */}
-                       <div className="mb-4 relative z-10">
-                          <div className="space-y-2">
-                             <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
-                                <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
-                                Desired Profit Target (Pips)
-                             </label>
-                             <div className="relative group">
-                                <input
-                                   type="text"
-                                   value={desiredPips}
-                                   onChange={(e) => setDesiredPips(e.target.value)}
-                                   className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-emerald-400 font-bold text-lg"
-                                />
-                                <div className="absolute inset-0 border border-emerald-500/0 group-hover:border-emerald-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
-                             </div>
-                          </div>
-                       </div>
-
+                       {/* Mode Toggle: Pips vs Manual */}
                        <div className="flex gap-2 mb-4">
                           <button
-                             onClick={() => setExitInputMode('order')}
+                             onClick={() => setExitScenarioMode('pips')}
                              className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
-                                exitInputMode === 'order' 
+                                exitScenarioMode === 'pips' 
                                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
                                    : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700'
                              }`}
                           >
-                             BY ORDER #
+                             BY PIPS
                           </button>
                           <button
-                             onClick={() => setExitInputMode('price')}
+                             onClick={() => setExitScenarioMode('manual')}
                              className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
-                                exitInputMode === 'price' 
+                                exitScenarioMode === 'manual' 
                                    ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
                                    : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700'
                              }`}
                           >
-                             BY PRICE
+                             MANUAL EXIT
                           </button>
                        </div>
 
-                       <div className="mb-4 relative z-10">
-                          {exitInputMode === 'order' ? (
+                       {exitScenarioMode === 'pips' ? (
+                          /* Desired Profit Target Input */
+                          <div className="mb-4 relative z-10">
                              <div className="space-y-2">
                                 <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
                                    <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
-                                   Exit at Order Number
+                                   Desired Profit Target (Pips)
                                 </label>
-                                <input
-                                   type="number"
-                                   value={exitOrderNumber}
-                                   onChange={(e) => setExitOrderNumber(e.target.value === '' ? '' : Number(e.target.value))}
-                                   className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
-                                   placeholder="Enter order number..."
-                                />
+                                <div className="relative group">
+                                   <input
+                                      type="text"
+                                      value={desiredPips}
+                                      onChange={(e) => setDesiredPips(e.target.value)}
+                                      className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-emerald-400 font-bold text-lg"
+                                   />
+                                   <div className="absolute inset-0 border border-emerald-500/0 group-hover:border-emerald-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                                </div>
                              </div>
-                          ) : (
-                             <div className="space-y-2">
-                                <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
-                                   <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
-                                   Exit at Price
-                                </label>
-                                <input
-                                   type="number"
-                                   value={exitPrice}
-                                   onChange={(e) => setExitPrice(e.target.value === '' ? '' : Number(e.target.value))}
-                                   step="0.001"
-                                   className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
-                                   placeholder="Enter exit price..."
-                                />
+                          </div>
+                       ) : (
+                          /* Manual Exit: Order/Price */
+                          <>
+                             <div className="flex gap-2 mb-4">
+                                <button
+                                   onClick={() => setExitInputMode('order')}
+                                   className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
+                                      exitInputMode === 'order' 
+                                         ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
+                                         : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                   }`}
+                                >
+                                   BY ORDER #
+                                </button>
+                                <button
+                                   onClick={() => setExitInputMode('price')}
+                                   className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
+                                      exitInputMode === 'price' 
+                                         ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' 
+                                         : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                   }`}
+                                >
+                                   BY PRICE
+                                </button>
                              </div>
-                          )}
-                       </div>
 
-                       {(exitOrderNumber !== '' || exitPrice !== '') && simResult && (() => {
+                             <div className="mb-4 relative z-10">
+                                {exitInputMode === 'order' ? (
+                                   <div className="space-y-2">
+                                      <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
+                                         <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
+                                         Exit at Order Number
+                                      </label>
+                                      <input
+                                         type="number"
+                                         value={exitOrderNumber}
+                                         onChange={(e) => setExitOrderNumber(e.target.value === '' ? '' : Number(e.target.value))}
+                                         className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
+                                         placeholder="Enter order number..."
+                                      />
+                                   </div>
+                                ) : (
+                                   <div className="space-y-2">
+                                      <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
+                                         <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
+                                         Exit at Price
+                                      </label>
+                                      <input
+                                         type="number"
+                                         value={exitPrice}
+                                         onChange={(e) => setExitPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                                         step="0.001"
+                                         className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/50 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
+                                         placeholder="Enter exit price..."
+                                      />
+                                   </div>
+                                )}
+                             </div>
+                          </>
+                       )}
+
+                       {/* Display Results - Always Visible */}
+                       {simResult && (() => {
                           let targetPrice = 0;
                           let projectedProfit = simResult.summary.pnl;
                           let marketMove = 0;
 
-                          if (exitInputMode === 'order' && exitOrderNumber !== '' && simResult.positions[Number(exitOrderNumber) - 1]) {
-                             targetPrice = simResult.positions[Number(exitOrderNumber) - 1].price;
-                             marketMove = Math.abs(targetPrice - Number(entryPrice));
-                          } else if (exitInputMode === 'price' && exitPrice !== '') {
-                             targetPrice = Number(exitPrice);
-                             marketMove = Math.abs(targetPrice - Number(entryPrice));
+                          if (exitScenarioMode === 'manual') {
+                             // Manual mode: use order number or price
+                             if (exitInputMode === 'order' && exitOrderNumber !== '' && simResult.positions[Number(exitOrderNumber) - 1]) {
+                                targetPrice = simResult.positions[Number(exitOrderNumber) - 1].price;
+                                marketMove = Math.abs(targetPrice - Number(entryPrice));
+                             } else if (exitInputMode === 'price' && exitPrice !== '') {
+                                targetPrice = Number(exitPrice);
+                                marketMove = Math.abs(targetPrice - Number(entryPrice));
+                             }
+                          } else {
+                             // Pips mode: use profTgt calculation
+                             targetPrice = profTgt.targetPrice;
+                             projectedProfit = profTgt.profit;
+                             marketMove = profTgt.move;
                           }
 
-                          return targetPrice > 0 ? (
+                          return (
                              <>
                                 <div className="grid grid-cols-2 gap-4 relative z-10 mb-4">
                                    <div className="glass-input rounded-xl p-4 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group">
                                       <div className="text-[10px] text-emerald-500 font-bold uppercase mb-1 group-hover:text-emerald-400 transition-colors">Target Price</div>
-                                      <div className="font-mono text-xl font-bold text-emerald-400 text-glow">{formatNumber(targetPrice)}</div>
+                                      <div className="font-mono text-xl font-bold text-emerald-400 text-glow">{formatNumber(targetPrice || 0)}</div>
                                    </div>
                                    <div className="glass-input rounded-xl p-4 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group">
                                       <div className="text-[10px] text-emerald-500 font-bold uppercase mb-1 group-hover:text-emerald-400 transition-colors">Projected Profit</div>
-                                      <div className="font-mono text-xl font-bold text-emerald-400 text-glow">{formatCurrency(projectedProfit)}</div>
+                                      <div className="font-mono text-xl font-bold text-emerald-400 text-glow">{formatCurrency(projectedProfit || 0)}</div>
                                    </div>
                                 </div>
                                 
                                 <div className="text-center relative z-10 bg-emerald-500/5 rounded-lg py-2 border border-emerald-500/10">
                                    <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">
-                                      Requires market move of <span className="text-emerald-400 font-mono text-sm ml-1">{formatNumber(marketMove)} pts</span>
+                                      Requires market move of <span className="text-emerald-400 font-mono text-sm ml-1">{formatNumber(marketMove || 0)} pts</span>
                                    </span>
                                 </div>
                              </>
-                          ) : null;
+                          );
                        })()}
                     </div>
                  </Card>
