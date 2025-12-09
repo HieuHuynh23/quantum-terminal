@@ -999,9 +999,8 @@ export const App = () => {
 
                     <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-2">Exit point will auto-enable WIN mode</div>
 
-                    {
-                       <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
-                          <div className="flex gap-2">
+                    <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                       <div className="flex gap-2">
                              <button
                                 onClick={() => setExitInputMode('order')}
                                 className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
