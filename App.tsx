@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Calculator, Settings, Activity, Target, ArrowLeftRight, 
-  TrendingUp, Wallet, Download, ShieldAlert, 
+  TrendingUp, TrendingDown, Wallet, Download, ShieldAlert, 
   MousePointerClick, RefreshCw, BarChart3, AlertTriangle, 
   ChevronRight, Layers, DollarSign, Percent, Zap, Minus, Plus
 } from 'lucide-react';
@@ -56,7 +56,7 @@ interface HedgeConfig {
 const formatCurrency = (val: number) => 
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(val);
 
-const formatNumber = (val: number, digits = 2) => 
+const formatNumber = (val: number, digits = 3) => 
   new Intl.NumberFormat('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(val);
 
 const formatPercent = (val: number) =>
@@ -76,7 +76,8 @@ function calculateSimulation(
   useDynamic: boolean,
   hedgeConfig: HedgeConfig,
   isWinMode: boolean = false,
-  targetProfit: number = 0
+  targetProfit: number = 0,
+  exitScenario?: { enabled: boolean; mode: 'order' | 'price'; orderNumber: number; price: number }
 ): SimulationResult {
   
   const isLong = direction === 'LONG';
@@ -210,7 +211,28 @@ function calculateSimulation(
   let finalMainPnL = 0;
   let finalHedgePnL = 0;
 
-  if (isWinMode) {
+  // --- EXIT SCENARIO LOGIC ---
+  if (exitScenario?.enabled) {
+      let exitPrice = maxPrice;
+      if (exitScenario.mode === 'order' && exitScenario.orderNumber > 0) {
+          const targetOrder = executedPositions[exitScenario.orderNumber - 1];
+          if (targetOrder) {
+              exitPrice = targetOrder.price;
+          }
+      } else if (exitScenario.mode === 'price') {
+          exitPrice = exitScenario.price;
+      }
+
+      finalPositions = executedPositions.map(p => {
+          let pnl = 0;
+          if (p.type === 'HEDGE') {
+             pnl = (exitPrice - p.price) * p.lot * contractSize * (-dirMult);
+          } else {
+             pnl = (exitPrice - p.price) * p.lot * contractSize * dirMult;
+          }
+          return { ...p, indivPnL: pnl };
+      });
+  } else if (isWinMode) {
       const exitPrice = netAvgPrice + (targetProfit * dirMult);
       finalPositions = executedPositions.map(p => {
           let pnl = 0;
@@ -407,6 +429,12 @@ export const App = () => {
   const [desiredPips, setDesiredPips] = useState<string>('20');
   const [isWinMode, setIsWinMode] = useState(false);
   
+  // Exit Scenario
+  const [useExitScenario, setUseExitScenario] = useState(false);
+  const [exitInputMode, setExitInputMode] = useState<'order' | 'price'>('order');
+  const [exitOrderNumber, setExitOrderNumber] = useState<number | ''>(5);
+  const [exitPrice, setExitPrice] = useState<number | ''>(4190);
+  
   // Computed
   const [simResult, setSimResult] = useState<SimulationResult | null>(null);
   
@@ -420,10 +448,11 @@ export const App = () => {
         Number(entryPrice), maxPrice, Number(step), Number(initLot), Number(multi), direction, contractSize, useDynamic,
         { enabled: useHedge, stopLossAmount: hedgeStopLoss, lotMulti: Number(hedgeLotMulti), slMulti: Number(hedgeSlMulti) },
         isWinMode,
-        Number(desiredPips) || 0
+        Number(desiredPips) || 0,
+        { enabled: useExitScenario, mode: exitInputMode, orderNumber: Number(exitOrderNumber), price: Number(exitPrice) }
     );
     setSimResult(res);
-  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti, isWinMode, desiredPips]);
+  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti, isWinMode, desiredPips, useExitScenario, exitInputMode, exitOrderNumber, exitPrice]);
 
   // --- HANDLERS ---
   const handleDirectionChange = (newDir: 'LONG' | 'SHORT') => {
@@ -470,8 +499,8 @@ export const App = () => {
         else { if (be < tBE) low = midRange; else high = midRange; }
     }
     const newRange = Math.abs(entryPrice - bestMax);
-    setRange(parseFloat(newRange.toFixed(2)));
-    setMaxPrice(parseFloat(bestMax.toFixed(2)));
+    setRange(parseFloat(newRange.toFixed(3)));
+    setMaxPrice(parseFloat(bestMax.toFixed(3)));
   };
 
   const solveForTargetPnL = (target: number) => {
@@ -485,8 +514,8 @@ export const App = () => {
         if (pnl > target) low = midRange; else high = midRange;
      }
      const newRange = Math.abs(entryPrice - bestMax);
-     setRange(parseFloat(newRange.toFixed(2)));
-     setMaxPrice(parseFloat(bestMax.toFixed(2)));
+     setRange(parseFloat(newRange.toFixed(3)));
+     setMaxPrice(parseFloat(bestMax.toFixed(3)));
   };
 
   useEffect(() => {
@@ -534,7 +563,7 @@ export const App = () => {
     if (!simResult) return;
     const headers = ['Type', 'Level', 'Price', 'Lot', 'Indiv PnL', 'Cumul PnL', 'Total Lot', 'Avg Price'];
     const rows = simResult.positions.map(p => [
-       p.type, p.level, p.price, p.lot, p.indivPnL.toFixed(2), p.cumPnL.toFixed(2), p.totalLot.toFixed(2), p.avgPrice.toFixed(2)
+       p.type, p.level, p.price, p.lot, p.indivPnL.toFixed(2), p.cumPnL.toFixed(2), p.totalLot.toFixed(3), p.avgPrice.toFixed(3)
     ]);
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
     const link = document.createElement("a");
@@ -958,6 +987,74 @@ export const App = () => {
                     )}
                  </div>
               </Card>
+
+              {/* Exit Scenario Card */}
+              <Card sectionColor="#8b5cf6">
+                 <div className="p-5 space-y-4">
+                    <div className="flex justify-between items-center">
+                       <SectionHeader icon={TrendingDown} title="Exit Scenario" color={useExitScenario ? 'text-violet-400' : 'text-zinc-400'} />
+                       <Toggle active={useExitScenario} onToggle={() => setUseExitScenario(!useExitScenario)} label={useExitScenario ? "ACTIVE" : "OFF"} />
+                    </div>
+
+                    {useExitScenario && (
+                       <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                          <div className="flex gap-2">
+                             <button
+                                onClick={() => setExitInputMode('order')}
+                                className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
+                                   exitInputMode === 'order' 
+                                      ? 'bg-violet-500/20 border-violet-500/50 text-violet-400' 
+                                      : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                }`}
+                             >
+                                BY ORDER #
+                             </button>
+                             <button
+                                onClick={() => setExitInputMode('price')}
+                                className={`flex-1 px-3 py-2 rounded text-xs font-bold border transition-all ${
+                                   exitInputMode === 'price' 
+                                      ? 'bg-violet-500/20 border-violet-500/50 text-violet-400' 
+                                      : 'bg-zinc-900/50 border-zinc-800 text-zinc-500 hover:border-zinc-700'
+                                }`}
+                             >
+                                BY PRICE
+                             </button>
+                          </div>
+
+                          {exitInputMode === 'order' ? (
+                             <div className="space-y-2">
+                                <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
+                                   <span className="w-1 h-1 bg-violet-500 rounded-full"></span>
+                                   Exit at Order Number
+                                </label>
+                                <input
+                                   type="number"
+                                   value={exitOrderNumber}
+                                   onChange={(e) => setExitOrderNumber(e.target.value === '' ? '' : Number(e.target.value))}
+                                   className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-violet-500/50 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
+                                   placeholder="Enter order number..."
+                                />
+                             </div>
+                          ) : (
+                             <div className="space-y-2">
+                                <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
+                                   <span className="w-1 h-1 bg-violet-500 rounded-full"></span>
+                                   Exit at Price
+                                </label>
+                                <input
+                                   type="number"
+                                   value={exitPrice}
+                                   onChange={(e) => setExitPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                                   step="0.001"
+                                   className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-violet-500/50 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
+                                   placeholder="Enter exit price..."
+                                />
+                             </div>
+                          )}
+                       </div>
+                    )}
+                 </div>
+              </Card>
            </div>
 
            {/* === RIGHT COLUMN: DATA VISUALIZATION === */}
@@ -1017,6 +1114,29 @@ export const App = () => {
                           <StatRow label="Grid PnL (Floating)" value={formatCurrency(simResult.summary.mainPnL)} colorClass="text-zinc-400" />
                           <StatRow label="Total Grid Lots" value={formatNumber(simResult.summary.totalLot)} colorClass="text-zinc-300" />
                           <StatRow label="Total Positions" value={simResult.summary.slot.toString()} colorClass="text-zinc-300" />
+                          
+                          {/* Order Statistics */}
+                          <StatRow 
+                             label="Loss Orders (Count)" 
+                             value={`${simResult.positions.filter(p => p.indivPnL < 0).length} orders`} 
+                             colorClass="text-rose-400" 
+                          />
+                          <StatRow 
+                             label="Loss Orders (Lots)" 
+                             value={formatNumber(simResult.positions.filter(p => p.indivPnL < 0).reduce((sum, p) => sum + p.lot, 0))} 
+                             colorClass="text-rose-400" 
+                          />
+                          <StatRow 
+                             label="Profit Orders (Count)" 
+                             value={`${simResult.positions.filter(p => p.indivPnL > 0).length} orders`} 
+                             colorClass="text-emerald-400" 
+                          />
+                          <StatRow 
+                             label="Profit Orders (Lots)" 
+                             value={formatNumber(simResult.positions.filter(p => p.indivPnL > 0).reduce((sum, p) => sum + p.lot, 0))} 
+                             colorClass="text-emerald-400" 
+                          />
+                          
                           {simResult.summary.isHedged && (
                              <>
                                 <StatRow label="Hedge Lot Size" value={formatNumber(simResult.summary.hedgeLot)} highlight colorClass="text-amber-400" />
