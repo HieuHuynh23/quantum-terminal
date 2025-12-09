@@ -430,10 +430,9 @@ export const App = () => {
   const [isWinMode, setIsWinMode] = useState(false);
   
   // Exit Scenario
-  const [useExitScenario, setUseExitScenario] = useState(false);
   const [exitInputMode, setExitInputMode] = useState<'order' | 'price'>('order');
-  const [exitOrderNumber, setExitOrderNumber] = useState<number | ''>(5);
-  const [exitPrice, setExitPrice] = useState<number | ''>(4190);
+  const [exitOrderNumber, setExitOrderNumber] = useState<number | ''>('');
+  const [exitPrice, setExitPrice] = useState<number | ''>('');
   
   // Computed
   const [simResult, setSimResult] = useState<SimulationResult | null>(null);
@@ -444,15 +443,18 @@ export const App = () => {
 
   // --- EFFECT: Calculation ---
   useEffect(() => {
+    const exitScenarioActive = (exitInputMode === 'order' && exitOrderNumber !== '') || (exitInputMode === 'price' && exitPrice !== '');
+    const effectiveWinMode = exitScenarioActive || isWinMode;
+    
     const res = calculateSimulation(
         Number(entryPrice), maxPrice, Number(step), Number(initLot), Number(multi), direction, contractSize, useDynamic,
         { enabled: useHedge, stopLossAmount: hedgeStopLoss, lotMulti: Number(hedgeLotMulti), slMulti: Number(hedgeSlMulti) },
-        isWinMode,
+        effectiveWinMode,
         Number(desiredPips) || 0,
-        { enabled: useExitScenario, mode: exitInputMode, orderNumber: Number(exitOrderNumber), price: Number(exitPrice) }
+        { enabled: exitScenarioActive, mode: exitInputMode, orderNumber: Number(exitOrderNumber), price: Number(exitPrice) }
     );
     setSimResult(res);
-  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti, isWinMode, desiredPips, useExitScenario, exitInputMode, exitOrderNumber, exitPrice]);
+  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti, isWinMode, desiredPips, exitInputMode, exitOrderNumber, exitPrice]);
 
   // --- HANDLERS ---
   const handleDirectionChange = (newDir: 'LONG' | 'SHORT') => {
@@ -992,11 +994,12 @@ export const App = () => {
               <Card sectionColor="#8b5cf6">
                  <div className="p-5 space-y-4">
                     <div className="flex justify-between items-center">
-                       <SectionHeader icon={TrendingDown} title="Exit Scenario" color={useExitScenario ? 'text-violet-400' : 'text-zinc-400'} />
-                       <Toggle active={useExitScenario} onToggle={() => setUseExitScenario(!useExitScenario)} label={useExitScenario ? "ACTIVE" : "OFF"} />
+                       <SectionHeader icon={TrendingDown} title="Exit Scenario" color={(exitOrderNumber !== '' || exitPrice !== '') ? 'text-violet-400' : 'text-zinc-400'} />
                     </div>
 
-                    {useExitScenario && (
+                    <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-2">Exit point will auto-enable WIN mode</div>
+
+                    {
                        <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
                           <div className="flex gap-2">
                              <button
@@ -1034,6 +1037,12 @@ export const App = () => {
                                    className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-violet-500/50 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
                                    placeholder="Enter order number..."
                                 />
+                                {exitOrderNumber !== '' && simResult && simResult.positions[Number(exitOrderNumber) - 1] && (
+                                   <div className="glass-input rounded px-3 py-2 border border-violet-500/20 bg-violet-500/5">
+                                      <div className="text-[9px] text-zinc-500 font-bold mb-0.5 uppercase tracking-wider">Price at Order #{exitOrderNumber}</div>
+                                      <div className="font-mono text-sm text-violet-400 font-bold">{formatNumber(simResult.positions[Number(exitOrderNumber) - 1].price)}</div>
+                                   </div>
+                                )}
                              </div>
                           ) : (
                              <div className="space-y-2">
@@ -1049,10 +1058,18 @@ export const App = () => {
                                    className="glass-input w-full px-4 py-2.5 rounded bg-zinc-900/50 border border-zinc-800 hover:border-violet-500/50 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 font-mono text-sm text-zinc-200 transition-all outline-none"
                                    placeholder="Enter exit price..."
                                 />
+                                {exitPrice !== '' && simResult && (() => {
+                                   const orderIndex = simResult.positions.findIndex(p => Math.abs(p.price - Number(exitPrice)) < 0.01);
+                                   return orderIndex >= 0 ? (
+                                      <div className="glass-input rounded px-3 py-2 border border-violet-500/20 bg-violet-500/5">
+                                         <div className="text-[9px] text-zinc-500 font-bold mb-0.5 uppercase tracking-wider">Nearest Order</div>
+                                         <div className="font-mono text-sm text-violet-400 font-bold">Order #{orderIndex + 1} ({simResult.positions[orderIndex].type}-{simResult.positions[orderIndex].level})</div>
+                                      </div>
+                                   ) : null;
+                                })()}
                              </div>
                           )}
                        </div>
-                    )}
                  </div>
               </Card>
            </div>
@@ -1122,8 +1139,8 @@ export const App = () => {
                              colorClass="text-rose-400" 
                           />
                           <StatRow 
-                             label="Loss Orders (Lots)" 
-                             value={formatNumber(simResult.positions.filter(p => p.indivPnL < 0).reduce((sum, p) => sum + p.lot, 0))} 
+                             label="Loss Orders (PnL)" 
+                             value={formatCurrency(simResult.positions.filter(p => p.indivPnL < 0).reduce((sum, p) => sum + p.indivPnL, 0))} 
                              colorClass="text-rose-400" 
                           />
                           <StatRow 
@@ -1132,8 +1149,8 @@ export const App = () => {
                              colorClass="text-emerald-400" 
                           />
                           <StatRow 
-                             label="Profit Orders (Lots)" 
-                             value={formatNumber(simResult.positions.filter(p => p.indivPnL > 0).reduce((sum, p) => sum + p.lot, 0))} 
+                             label="Profit Orders (PnL)" 
+                             value={formatCurrency(simResult.positions.filter(p => p.indivPnL > 0).reduce((sum, p) => sum + p.indivPnL, 0))} 
                              colorClass="text-emerald-400" 
                           />
                           
