@@ -1093,6 +1093,25 @@ export const App = () => {
                        
                        <div className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold mb-4">Exit point will auto-enable WIN mode</div>
 
+                       {/* Desired Profit Target Input */}
+                       <div className="mb-4 relative z-10">
+                          <div className="space-y-2">
+                             <label className="text-[10px] uppercase tracking-wider font-bold text-zinc-500 flex items-center gap-2">
+                                <span className="w-1 h-1 bg-emerald-500 rounded-full"></span>
+                                Desired Profit Target (Pips)
+                             </label>
+                             <div className="relative group">
+                                <input
+                                   type="text"
+                                   value={desiredPips}
+                                   onChange={(e) => setDesiredPips(e.target.value)}
+                                   className="glass-input w-full pl-3 pr-3 py-2 text-right font-mono text-emerald-400 font-bold text-lg"
+                                />
+                                <div className="absolute inset-0 border border-emerald-500/0 group-hover:border-emerald-500/30 rounded-lg pointer-events-none transition-all duration-300"></div>
+                             </div>
+                          </div>
+                       </div>
+
                        <div className="flex gap-2 mb-4">
                           <button
                              onClick={() => setExitInputMode('order')}
