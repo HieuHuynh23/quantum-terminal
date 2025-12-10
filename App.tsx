@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { 
   Calculator, Settings, Activity, Target, ArrowLeftRight, 
   TrendingUp, TrendingDown, Wallet, Download, ShieldAlert, 
@@ -442,11 +442,17 @@ export const App = () => {
   const isPnlInputFocused = useRef(false);
   const isBeInputFocused = useRef(false);
 
+  // --- MEMOIZED: Exit Scenario Active State ---
+  const exitScenarioActive = useMemo(() => {
+    return (exitInputMode === 'order' && exitOrderNumber !== '') || (exitInputMode === 'price' && exitPrice !== '');
+  }, [exitInputMode, exitOrderNumber, exitPrice]);
+
+  const effectiveWinMode = useMemo(() => {
+    return exitScenarioActive || isWinMode;
+  }, [exitScenarioActive, isWinMode]);
+
   // --- EFFECT: Calculation ---
   useEffect(() => {
-    const exitScenarioActive = (exitInputMode === 'order' && exitOrderNumber !== '') || (exitInputMode === 'price' && exitPrice !== '');
-    const effectiveWinMode = exitScenarioActive || isWinMode;
-    
     const res = calculateSimulation(
         Number(entryPrice), maxPrice, Number(step), Number(initLot), Number(multi), direction, contractSize, useDynamic,
         { enabled: useHedge, stopLossAmount: hedgeStopLoss, lotMulti: Number(hedgeLotMulti), slMulti: Number(hedgeSlMulti) },
@@ -455,41 +461,41 @@ export const App = () => {
         { enabled: exitScenarioActive, mode: exitInputMode, orderNumber: Number(exitOrderNumber), price: Number(exitPrice) }
     );
     setSimResult(res);
-  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti, isWinMode, desiredPips, exitInputMode, exitOrderNumber, exitPrice]);
+  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti, effectiveWinMode, desiredPips, exitScenarioActive, exitInputMode, exitOrderNumber, exitPrice]);
 
   // --- HANDLERS ---
-  const handleDirectionChange = (newDir: 'LONG' | 'SHORT') => {
+  const handleDirectionChange = useCallback((newDir: 'LONG' | 'SHORT') => {
     setDirection(newDir);
     const ep = Number(entryPrice);
     const r = Number(range);
     if (newDir === 'LONG') setMaxPrice(ep - r);
     else setMaxPrice(ep + r);
-  };
+  }, [entryPrice, range]);
 
-  const handleEntryChange = (val: number | '') => {
+  const handleEntryChange = useCallback((val: number | '') => {
     setEntryPrice(val);
     const numVal = Number(val);
     const r = Number(range);
     if (direction === 'LONG') setMaxPrice(numVal - r);
     else setMaxPrice(numVal + r);
-  };
+  }, [direction, range]);
 
-  const handleRangeChange = (val: number | '') => {
+  const handleRangeChange = useCallback((val: number | '') => {
     setRange(val);
     const ep = Number(entryPrice);
     const r = Number(val);
     if (direction === 'LONG') setMaxPrice(ep - r);
     else setMaxPrice(ep + r);
-  };
+  }, [entryPrice, direction]);
   
-  const handleTargetPnLChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTargetPnLChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value;
       setPnlInputDisplay(val);
       if (val !== '' && !isNaN(Number(val))) setTargetPnL(Number(val));
-  };
+  }, []);
   
   // Solvers
-  const solveForTargetBE = (tBE: number) => {
+  const solveForTargetBE = useCallback((tBE: number) => {
     if (!tBE || tBE <= 0) return;
     let low = 0.1, high = 5000, bestMax = maxPrice;
     for(let i=0; i<30; i++) {
@@ -504,9 +510,9 @@ export const App = () => {
     const newRange = Math.abs(entryPrice - bestMax);
     setRange(parseFloat(newRange.toFixed(3)));
     setMaxPrice(parseFloat(bestMax.toFixed(3)));
-  };
+  }, [entryPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti]);
 
-  const solveForTargetPnL = (target: number) => {
+  const solveForTargetPnL = useCallback((target: number) => {
      let low = 0.1, high = 5000, bestMax = maxPrice;
      for(let i=0; i<30; i++) {
         const midRange = (low + high) / 2;
@@ -519,37 +525,37 @@ export const App = () => {
      const newRange = Math.abs(entryPrice - bestMax);
      setRange(parseFloat(newRange.toFixed(3)));
      setMaxPrice(parseFloat(bestMax.toFixed(3)));
-  };
+  }, [entryPrice, maxPrice, step, initLot, multi, direction, contractSize, useDynamic, useHedge, hedgeStopLoss, hedgeLotMulti, hedgeSlMulti]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
         if (isBeInputFocused.current && targetBE !== '' && !isNaN(Number(targetBE))) solveForTargetBE(Number(targetBE));
     }, 600);
     return () => clearTimeout(timer);
-  }, [targetBE]);
+  }, [targetBE, solveForTargetBE]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
         if (isPnlInputFocused.current && !isNaN(targetPnL)) solveForTargetPnL(targetPnL);
     }, 600);
     return () => clearTimeout(timer);
-  }, [targetPnL]);
+  }, [targetPnL, solveForTargetPnL]);
 
   useEffect(() => {
      if (!simResult) return;
      if (!isPnlInputFocused.current) setPnlInputDisplay(simResult.summary.pnl.toFixed(0));
   }, [simResult]);
 
-  const stats = (() => {
+  const stats = useMemo(() => {
     if (!simResult) return { equity: balance, ddAmount: 0, ddPercent: 0 };
     const pnl = simResult.summary.pnl;
     const equity = balance + pnl;
     const ddAmount = pnl < 0 ? Math.abs(pnl) : 0;
     const ddPercent = (ddAmount / balance) * 100;
     return { equity, ddAmount, ddPercent };
-  })();
+  }, [simResult, balance]);
 
-  const profTgt = (() => {
+  const profTgt = useMemo(() => {
     if (!simResult) return { targetPrice: 0, profit: 0, move: 0 };
     const pips = parseFloat(desiredPips) || 0;
     const be = simResult.summary.netAvgPrice || simResult.summary.avgPrice;
@@ -560,7 +566,7 @@ export const App = () => {
     const profit = pips * netLot * contractSize;
     const move = Math.abs(targetPrice - maxPrice);
     return { targetPrice, profit, move };
-  })();
+  }, [simResult, desiredPips, direction, contractSize, maxPrice]);
 
   const handleExportCSV = () => {
     if (!simResult) return;
@@ -577,21 +583,25 @@ export const App = () => {
     document.body.removeChild(link);
   };
 
-  const mainData = simResult?.positions.filter(p => p.type === 'ENTRY' || p.type === 'MAIN') || [];
-  const dynData = simResult?.positions.filter(p => p.type === 'DYN') || [];
-  const hedgeData = simResult?.positions.filter(p => p.type === 'HEDGE') || [];
+  const mainData = useMemo(() => simResult?.positions.filter(p => p.type === 'ENTRY' || p.type === 'MAIN') || [], [simResult]);
+  const dynData = useMemo(() => simResult?.positions.filter(p => p.type === 'DYN') || [], [simResult]);
+  const hedgeData = useMemo(() => simResult?.positions.filter(p => p.type === 'HEDGE') || [], [simResult]);
 
   // Calculate Chart Domain
-  const allChartPrices = [
-      entryPrice,
-      maxPrice,
-      profTgt.targetPrice,
-      ...(simResult?.positions.map(p => p.price) || [])
-  ];
-  if (simResult?.summary.hedgeTriggerPrice) allChartPrices.push(simResult.summary.hedgeTriggerPrice);
-  
-  const minChartPrice = Math.min(...allChartPrices);
-  const maxChartPrice = Math.max(...allChartPrices);
+  const { minChartPrice, maxChartPrice } = useMemo(() => {
+    const allChartPrices = [
+        entryPrice,
+        maxPrice,
+        profTgt.targetPrice,
+        ...(simResult?.positions.map(p => p.price) || [])
+    ];
+    if (simResult?.summary.hedgeTriggerPrice) allChartPrices.push(simResult.summary.hedgeTriggerPrice);
+    
+    return {
+      minChartPrice: Math.min(...allChartPrices),
+      maxChartPrice: Math.max(...allChartPrices)
+    };
+  }, [entryPrice, maxPrice, profTgt.targetPrice, simResult]);
   const pricePadding = (maxChartPrice - minChartPrice) * 0.05; // 5% padding
   const yDomain = [minChartPrice - pricePadding, maxChartPrice + pricePadding];
 
