@@ -453,11 +453,13 @@ export const App = () => {
 
   // --- EFFECT: Calculation ---
   useEffect(() => {
+    const pipValue = 0.1; // 1 pip = 0.1 for 3 decimal places
+    const targetProfitInPrice = (Number(desiredPips) || 0) * pipValue;
     const res = calculateSimulation(
         Number(entryPrice), maxPrice, Number(step), Number(initLot), Number(multi), direction, contractSize, useDynamic,
         { enabled: useHedge, stopLossAmount: hedgeStopLoss, lotMulti: Number(hedgeLotMulti), slMulti: Number(hedgeSlMulti) },
         effectiveWinMode,
-        Number(desiredPips) || 0,
+        targetProfitInPrice,
         { enabled: exitScenarioActive, mode: exitInputMode, orderNumber: Number(exitOrderNumber), price: Number(exitPrice) }
     );
     setSimResult(res);
@@ -558,12 +560,14 @@ export const App = () => {
   const profTgt = useMemo(() => {
     if (!simResult) return { targetPrice: 0, profit: 0, move: 0 };
     const pips = parseFloat(desiredPips) || 0;
+    const pipValue = 0.1; // 1 pip = 0.1 for 3 decimal places (e.g., XAUUSD)
+    const priceMove = pips * pipValue;
     const be = simResult.summary.netAvgPrice || simResult.summary.avgPrice;
     const netLot = simResult.summary.netLot;
     const isNetLong = (direction === 'LONG' && simResult.summary.totalLot >= simResult.summary.hedgeLot) ||
                       (direction === 'SHORT' && simResult.summary.hedgeLot > simResult.summary.totalLot);
-    const targetPrice = isNetLong ? be + pips : be - pips;
-    const profit = pips * netLot * contractSize;
+    const targetPrice = isNetLong ? be + priceMove : be - priceMove;
+    const profit = priceMove * netLot * contractSize;
     const move = Math.abs(targetPrice - maxPrice);
     return { targetPrice, profit, move };
   }, [simResult, desiredPips, direction, contractSize, maxPrice]);
