@@ -639,9 +639,6 @@ export const App = () => {
 
       return (
           <g transform={`translate(${x},${y})`}>
-              {/* Label Background for better contrast */}
-              <rect x={-54} y={-13} width={58} height={27} fill="#18181b" rx={4} opacity={0.9} />
-              
               {/* Label Name (ENTRY, MAX...) */}
               <text x={-4} y={-3} textAnchor="end" fill={level.color} fontSize={9} fontWeight="900" letterSpacing="0.5px">
                   {level.label}
